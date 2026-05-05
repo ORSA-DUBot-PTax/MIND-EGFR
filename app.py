@@ -22,6 +22,13 @@ try:
 except ImportError:
     RDKIT_AVAILABLE = False
 
+# Optional image size handling for Workflow tab
+try:
+    from PIL import Image
+    PIL_AVAILABLE = True
+except ImportError:
+    PIL_AVAILABLE = False
+
 # ========== MUST BE FIRST STREAMLIT COMMAND ==========
 st.set_page_config(
     page_title="MIND-EGFR",
@@ -232,6 +239,23 @@ def local_css():
             margin-bottom: 0.45rem;
             color: #1f4788;
         }
+
+        /* Workflow image styling */
+        .workflow-box {
+            background: linear-gradient(135deg, #eae8e0 0%, #e8f1f9 100%);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            border: 1px solid #d4e4f7;
+            box-shadow: 0 3px 10px rgba(0, 102, 204, 0.08);
+            margin-bottom: 0.75rem;
+        }
+        .workflow-box p {
+            color: #2e5c8a;
+            line-height: 1.45;
+            font-size: 0.92rem;
+            margin: 0.2rem 0;
+        }
+
         div[data-baseweb="tab-list"] {
             gap: 0.4rem;
         }
@@ -308,7 +332,6 @@ def local_css():
             margin-bottom: 0.15rem;
         }
 
-        
         /* Radio buttons (navigation) */
         div[role="radiogroup"] label {
             background-color: #e8f1f9;
@@ -384,6 +407,9 @@ local_css()
 # ------------------------------
 DB_DIR = Path("database")
 DB_DIR.mkdir(exist_ok=True)
+
+# Workflow image should be placed in the same root folder as app.py
+WORKFLOW_IMAGE_PATH = Path("workflow.png")
 
 # Look for the database file in root first, then in database folder
 if Path("egfr_npdb.db").exists():
@@ -604,7 +630,11 @@ def format_detail_value(field, value, group_name=""):
     if field_lower.endswith(("_prediction", "_pred")):
         if "toxicity" in group_name.lower():
             return label_yes_no(value)
-        if "ml predictions" in group_name.lower() or field_lower in ["ensemble_prediction", "rf_prediction", "svm_prediction", "knn_prediction", "xgboost_prediction", "lightgbm_prediction", "et_prediction"]:
+        if "ml predictions" in group_name.lower() or field_lower in [
+            "ensemble_prediction", "rf_prediction", "svm_prediction",
+            "knn_prediction", "xgboost_prediction", "lightgbm_prediction",
+            "et_prediction"
+        ]:
             return label_active_inactive(value)
     return value
 
@@ -620,6 +650,46 @@ def make_predictions_user_friendly(results_df):
         formatted_df[col] = formatted_df[col].apply(label_active_inactive)
 
     return formatted_df
+
+def show_workflow_image():
+    """Display workflow.png without excessive enlargement."""
+    st.markdown("#### 🧭 MIND-EGFR Workflow")
+
+    st.markdown("""
+    <div class="workflow-box">
+        <p>This workflow summarizes the overall MIND-EGFR pipeline, including database construction, molecular filtering, EGFR bioactivity prediction, ADME/toxicity annotation, docking, and compound prioritization.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if not WORKFLOW_IMAGE_PATH.exists():
+        st.warning(
+            "⚠️ workflow.png was not found. Please place workflow.png in the same main/root folder as app.py."
+        )
+        return
+
+    try:
+        if PIL_AVAILABLE:
+            workflow_img = Image.open(WORKFLOW_IMAGE_PATH)
+            img_width, img_height = workflow_img.size
+
+            # Prevent over-enlargement: show at natural width if smaller,
+            # or cap display width at 900 px if image is larger.
+            display_width = min(img_width, 900)
+
+            st.image(
+                workflow_img,
+                caption="Workflow of the MIND-EGFR platform",
+                width=display_width
+            )
+        else:
+            # Fallback if PIL is unavailable
+            st.image(
+                str(WORKFLOW_IMAGE_PATH),
+                caption="Workflow of the MIND-EGFR platform",
+                width=900
+            )
+    except Exception as e:
+        st.error(f"Could not load workflow.png: {e}")
 
 # ------------------------------
 # Load Pre-trained Models (Cached)
@@ -776,8 +846,9 @@ if mode == "📊 Database Browser":
     """, unsafe_allow_html=True)
 
     # Compact About Section with tabs
-    about_tab, construction_tab, performance_tab, features_tab, detailed_tab = st.tabs([
+    about_tab, workflow_tab, construction_tab, performance_tab, features_tab, detailed_tab = st.tabs([
         "ℹ️ About",
+        "🧭 Workflow",
         "📦 Database Construction",
         "⚙️ ML Performance",
         "🧬 Key Features",
@@ -791,6 +862,9 @@ if mode == "📊 Database Browser":
             <p><strong>MIND-EGFR</strong> (<strong>Machine Intelligence for Natural Drugs targeting EGFR</strong>) is a dynamic machine learning and structure-based web resource that integrates a curated natural-product database with EGFR-focused bioactivity prediction, ADME and drug-likeness profiling, toxicity annotation, and molecular docking results. Designed to support efficient compound prioritization, MIND-EGFR provides an interactive platform for exploring, filtering, evaluating, and ranking natural products with potential EGFR-inhibitory activity. By combining data-driven intelligence with structure-guided drug discovery, the platform helps researchers identify promising natural compounds for further experimental validation against EGFR.</p>
         </div>
         """, unsafe_allow_html=True)
+
+    with workflow_tab:
+        show_workflow_image()
 
     with construction_tab:
         st.markdown("#### 📦 Database Construction")
@@ -806,7 +880,7 @@ if mode == "📊 Database Browser":
     with performance_tab:
         st.markdown("#### ⚙️ Machine Learning Performance")
         st.markdown("""
-        - **Ensemble model** – 5‑fold CV AUC: **0.9646 ± 0.0037**  
+        - **Ensemble model** – 5-fold CV AUC: **0.9646 ± 0.0037**  
         - External validation accuracy: **88.05%**, AUC: **0.9411**  
         - Individual classifiers: RF, SVM, KNN, XGBoost, LightGBM, ExtraTrees  
         - All models trained on Morgan fingerprints (radius 2, 2048 bits)
@@ -817,8 +891,8 @@ if mode == "📊 Database Browser":
         feat_cols = st.columns(3)
         features = [
             "🔎 Interactive Database Browser",
-            "🧪 On‑the‑fly Bioactivity Predictor",
-            "⚖️ Full ADME & Drug‑likeness Profiles",
+            "🧪 On-the-fly Bioactivity Predictor",
+            "⚖️ Full ADME & Drug-likeness Profiles",
             "⚠️ 20 Toxicity Endpoints",
             "🎯 Molecular Docking (AutoDock Vina)",
             "⬇️ Export Filtered Datasets"
@@ -830,7 +904,7 @@ if mode == "📊 Database Browser":
     with detailed_tab:
         st.markdown("#### 📊 Detailed ML Performance")
         st.markdown("""
-        | Model         | 5‑Fold CV AUC (mean ± SD) | External Accuracy | External AUC |
+        | Model         | 5-Fold CV AUC (mean ± SD) | External Accuracy | External AUC |
         |---------------|---------------------------|-------------------|--------------|
         | Random Forest | 0.9603 ± 0.0037           | 0.8810            | 0.9406       |
         | SVM           | 0.9548 ± 0.0054           | 0.8715            | 0.9250       |
@@ -885,8 +959,13 @@ if mode == "📊 Database Browser":
 
     st.sidebar.subheader("⚠️ Toxicity Flags")
     tox_flags = {}
-    for tox_col in ["herg_blockers_prediction", "dili_prediction", "ames_toxicity_prediction",
-                    "carcinogenicity_prediction", "hepatotoxicity_prediction"]:
+    for tox_col in [
+        "herg_blockers_prediction",
+        "dili_prediction",
+        "ames_toxicity_prediction",
+        "carcinogenicity_prediction",
+        "hepatotoxicity_prediction"
+    ]:
         if tox_col in df.columns:
             opts = ["All"] + safe_unique(df[tox_col])
             tox_flags[tox_col] = st.sidebar.selectbox(
@@ -1002,7 +1081,7 @@ if mode == "📊 Database Browser":
                 "ali_logs", "ali_class",
                 "silicos_it_logsw", "silicos_it_class"
             ],
-            "🧪 Drug‑likeness": [
+            "🧪 Drug-likeness": [
                 "gi_absorption", "bbb_permeant", "pgp_substrate",
                 "cyp1a2_inhibitor", "cyp2c19_inhibitor", "cyp2c9_inhibitor",
                 "cyp2d6_inhibitor", "cyp3a4_inhibitor", "log_kp",
@@ -1058,7 +1137,10 @@ if mode == "📊 Database Browser":
                             display_value = format_detail_value(field, row[field], group_name)
                             if field == "source_organism":
                                 display_value = format_source_organism(display_value)
-                                st.markdown(f"**{detail_label(field)}:** {display_value}", unsafe_allow_html=True)
+                                st.markdown(
+                                    f"**{detail_label(field)}:** {display_value}",
+                                    unsafe_allow_html=True
+                                )
                             else:
                                 st.write(f"**{detail_label(field)}:** {display_value}")
     else:
@@ -1174,7 +1256,9 @@ elif mode == "🧪 Bioactivity Predictor":
                 current_progress = (idx + 1) / total_smiles
                 progress_bar.progress(current_progress)
                 percentage = int(current_progress * 100)
-                progress_text.text(f"📊 Progress: {percentage}% ({idx + 1}/{total_smiles} compounds processed)")
+                progress_text.text(
+                    f"📊 Progress: {percentage}% ({idx + 1}/{total_smiles} compounds processed)"
+                )
         
         results_df = pd.DataFrame(results)
         results_df_display = make_predictions_user_friendly(results_df)
@@ -1182,8 +1266,10 @@ elif mode == "🧪 Bioactivity Predictor":
         st.success(f"✅ Predictions completed for {len(results_df_display)} compounds.")
         
         # Display columns for preview
-        display_cols = ['SMILES', 'QED', 'MW', 'LogP', 'TPSA', 'HBD', 'HBA', 'RotatableBonds', 
-                        'LipinskiViolations', 'ensemble_prob', 'ensemble_pred']
+        display_cols = [
+            'SMILES', 'QED', 'MW', 'LogP', 'TPSA', 'HBD', 'HBA', 'RotatableBonds',
+            'LipinskiViolations', 'ensemble_prob', 'ensemble_pred'
+        ]
         available_display = [c for c in display_cols if c in results_df.columns]
         
         # Download button for preview
