@@ -45,8 +45,8 @@ def local_css():
         
         /* Main container padding */
         .block-container {
-            padding-top: 2rem;
-            padding-bottom: 1rem;
+            padding-top: 1rem;
+            padding-bottom: 0.8rem;
             background-color: #f8f7f3;
         }
         
@@ -55,13 +55,16 @@ def local_css():
             color: #1f4788;
             font-weight: 800;
             border-bottom: 3px solid #0066cc;
-            padding-bottom: 0.8rem;
-            font-size: 2.5rem;
+            padding-bottom: 0.45rem;
+            margin-top: 0;
+            margin-bottom: 0.25rem;
+            font-size: 2.45rem;
         }
         h2 {
             color: #2e5c8a;
             font-weight: 700;
-            margin-top: 1.8rem;
+            margin-top: 1.1rem;
+            margin-bottom: 0.6rem;
             border-left: 5px solid #0066cc;
             padding-left: 1rem;
             font-size: 1.8rem;
@@ -70,6 +73,8 @@ def local_css():
             color: #1f4788;
             font-weight: 600;
             font-size: 1.4rem;
+            margin-top: 0.8rem;
+            margin-bottom: 0.5rem;
         }
         h4 {
             color: #2e5c8a;
@@ -80,7 +85,7 @@ def local_css():
         div[data-testid="metric-container"] {
             background: linear-gradient(145deg, #e8f1f9, #eae8e0);
             border-radius: 15px;
-            padding: 1.5rem;
+            padding: 1rem;
             box-shadow: 0 4px 12px rgba(0, 102, 204, 0.15);
             border-left: 5px solid #0066cc;
             transition: all 0.3s ease;
@@ -95,7 +100,7 @@ def local_css():
         }
         div[data-testid="metric-container"] div[data-testid="stMetricValue"] {
             color: #0066cc !important;
-            font-size: 2.2rem !important;
+            font-size: 1.9rem !important;
             font-weight: 800 !important;
         }
         
@@ -210,19 +215,20 @@ def local_css():
         .about-card {
             background: linear-gradient(135deg, #eae8e0 0%, #e8f1f9 100%);
             border-radius: 12px;
-            padding: 1.2rem 1.4rem;
+            padding: 0.95rem 1.25rem;
             border: 1px solid #d4e4f7;
             box-shadow: 0 3px 10px rgba(0, 102, 204, 0.08);
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.25rem;
         }
         .about-card p, .about-card li {
             color: #2e5c8a;
-            line-height: 1.5;
-            font-size: 0.95rem;
+            line-height: 1.48;
+            font-size: 0.92rem;
+            margin-bottom: 0.25rem;
         }
         .about-card h4 {
             margin-top: 0;
-            margin-bottom: 0.6rem;
+            margin-bottom: 0.45rem;
             color: #1f4788;
         }
         div[data-baseweb="tab-list"] {
@@ -232,7 +238,7 @@ def local_css():
             background-color: #e8f1f9;
             border-radius: 8px 8px 0 0;
             border: 1px solid #d4e4f7;
-            padding: 0.45rem 0.8rem;
+            padding: 0.38rem 0.75rem;
             color: #1f4788;
             font-weight: 700;
         }
@@ -252,8 +258,54 @@ def local_css():
             color: #0066cc;
         }
         .footer-section {
-            margin: 0.35rem 0;
+            margin: 0.28rem 0;
         }
+        /* Compact vertical spacing for the main landing area */
+        .main-title-block {
+            margin: 0 0 0.35rem 0;
+        }
+        .main-title {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            color: #1f4788;
+            font-size: 2.45rem;
+            line-height: 1.1;
+            font-weight: 800;
+            letter-spacing: 0.02rem;
+            border-bottom: 3px solid #0066cc;
+            padding-bottom: 0.45rem;
+            margin: 0;
+        }
+        .main-subtitle {
+            color: #0f2340;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-top: 0.25rem;
+            margin-bottom: 0.75rem;
+        }
+        .compact-divider {
+            border-top: 1px solid rgba(31, 71, 136, 0.18);
+            margin: 0.8rem 0 0.85rem 0;
+            height: 0;
+        }
+        div[data-testid="stMarkdownContainer"] > hr {
+            margin: 0.8rem 0 0.9rem 0;
+            border-top: 1px solid rgba(31, 71, 136, 0.18);
+        }
+        div[data-testid="stTabs"] {
+            margin-top: 0.15rem;
+        }
+        div[data-baseweb="tab-panel"] {
+            padding-top: 0.65rem;
+        }
+        div[data-testid="stMetric"] {
+            margin-bottom: 0.1rem;
+        }
+        div[data-testid="stMetricLabel"] {
+            margin-bottom: 0.15rem;
+        }
+
         
         /* Radio buttons (navigation) */
         div[role="radiogroup"] label {
@@ -579,9 +631,13 @@ mode = st.sidebar.radio("Select Mode", ["📊 Database Browser", "🧪 Bioactivi
 # ------------------------------
 if mode == "📊 Database Browser":
     # Main Title
-    st.title("🎗️ MIND-EGFR")
-    st.markdown("**A Machine Learning and Structure-Based Web Platform for Discovery of Natural Product EGFR Inhibitors**")
-    st.markdown("---")
+    st.markdown("""
+    <div class="main-title-block">
+        <div class="main-title">🎗️ MIND-EGFR</div>
+        <div class="main-subtitle">A Machine Learning and Structure-Based Web Platform for Discovery of Natural Product EGFR Inhibitors</div>
+    </div>
+    <div class="compact-divider"></div>
+    """, unsafe_allow_html=True)
 
     # Compact About Section with tabs
     about_tab, construction_tab, performance_tab, features_tab, detailed_tab = st.tabs([
@@ -653,7 +709,7 @@ if mode == "📊 Database Browser":
         - Mean of all control drugs: −7.98 kcal/mol
         """)
 
-    st.markdown("---")
+    st.markdown('<div class="compact-divider"></div>', unsafe_allow_html=True)
 
     # Sidebar filters (only shown in DB mode)
     st.sidebar.subheader("🔍 Filters")
@@ -749,7 +805,7 @@ if mode == "📊 Database Browser":
     better_best_count = (df["better_than_best_control"] == "Yes").sum() if "better_than_best_control" in df else 0
     col4.metric("Better than best control", better_best_count)
 
-    st.markdown("---")
+    st.markdown('<div class="compact-divider"></div>', unsafe_allow_html=True)
 
     st.subheader("📋 Compound Browser")
     browser_defaults = [
