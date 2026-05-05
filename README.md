@@ -25,14 +25,8 @@ The platform integrates a curated natural product database with machine learning
 
 MIND-EGFR functions as a hybrid platform with two major components:
 
-1. Database Browser
-
-Enables users to explore, filter, visualize, and download curated natural product records with integrated bioactivity, ADMET, toxicity, and docking information.
-
+1. Database Browser and 
 2. Bioactivity Predictor
-
-Allows users to predict EGFR inhibitory activity from user-provided SMILES using validated machine learning models.
-
 
 ## Why MIND-EGFR?
 
@@ -270,6 +264,4 @@ This project is licensed under the MIT License.
 
 ## Disclaimer
 
-MIND-EGFR is intended for research and educational use only. The bioactivity predictions, docking scores, ADMET annotations, toxicity predictions, and drug-likeness outputs are computational screening results.
-
-These results should be interpreted as preliminary evidence for compound prioritization and should not be considered experimental or clinical validation. Any compound identified using MIND-EGFR requires appropriate experimental confirmation before biological, pharmacological, or therapeutic conclusions are made.
+MIND-EGFR is intended for research and educational use only. The bioactivity predictions, docking scores, ADMET annotations, toxicity predictions, and drug-likeness outputs are computational screening results. These results should be interpreted as preliminary evidence for compound prioritization and should not be considered experimental or clinical validation. Any compound identified using MIND-EGFR requires appropriate experimental confirmation before biological, pharmacological, or therapeutic conclusions are made.
