@@ -24,7 +24,7 @@ except ImportError:
 
 # ========== MUST BE FIRST STREAMLIT COMMAND ==========
 st.set_page_config(
-    page_title="EGFR‑NPDB",
+    page_title="MIND-EGFR",
     page_icon="🧬",
     layout="wide"
 )
@@ -494,8 +494,8 @@ mode = st.sidebar.radio("Select Mode", ["📊 Database Browser", "🧪 Bioactivi
 # ------------------------------
 if mode == "📊 Database Browser":
     # Main Title
-    st.title("🎗️ EGFR‑NPDB")
-    st.markdown("**EGFR‑NPDB is an integrated web resource that combines a curated natural product database with an interactive bioactivity predictor, both focused on the Epidermal Growth Factor Receptor (EGFR) as a therapeutic target (PDB: 8F1Y).**")
+    st.title("🎗️ MIND-EGFR")
+    st.markdown("**MIND-EGFR is an integrated web resource that combines a curated natural product database with an interactive bioactivity predictor, both focused on the Epidermal Growth Factor Receptor (EGFR) as a therapeutic target (PDB: 8F1Y).**")
     st.markdown("---")
 
     # Enhanced Introduction Section
@@ -927,7 +927,7 @@ st.markdown("""
         Data Source: LOTUS Initiative (276,518 natural products) | Docking: AutoDock Vina | Target: EGFR (PDB: 8F1Y)
     </div>
     <div class="footer-section" style="opacity:0.7; margin-top:1rem;">
-        © 2026 EGFR‑NPDB — ML‑Guided Natural Product Database
+        © 2026 MIND-EGFR — ML‑Guided Natural Product Database
     </div>
 </div>
 """, unsafe_allow_html=True)
