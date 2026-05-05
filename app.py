@@ -45,7 +45,8 @@ def local_css():
         
         /* Main container padding */
         .block-container {
-            padding-top: 1rem;
+            /* Keep enough top padding so the custom title is not hidden under Streamlit's top toolbar */
+            padding-top: 2.35rem;
             padding-bottom: 0.8rem;
             background-color: #f8f7f3;
         }
@@ -262,7 +263,7 @@ def local_css():
         }
         /* Compact vertical spacing for the main landing area */
         .main-title-block {
-            margin: 0 0 0.35rem 0;
+            margin: 0.35rem 0 0.35rem 0;
         }
         .main-title {
             display: flex;
@@ -270,11 +271,12 @@ def local_css():
             gap: 0.65rem;
             color: #1f4788;
             font-size: 2.45rem;
-            line-height: 1.1;
+            line-height: 1.22;
             font-weight: 800;
             letter-spacing: 0.02rem;
             border-bottom: 3px solid #0066cc;
-            padding-bottom: 0.45rem;
+            padding-bottom: 0.4rem;
+            padding-top: 0.15rem;
             margin: 0;
         }
         .main-subtitle {
