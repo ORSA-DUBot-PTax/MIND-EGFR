@@ -24,7 +24,7 @@ except ImportError:
 
 # ========== MUST BE FIRST STREAMLIT COMMAND ==========
 st.set_page_config(
-    page_title="MIND-EGFR",
+    page_title="EGFR-MIND: A Machine Learning and Structure-Based Web Platform for Discovery of Natural Product EGFR Inhibitors",
     page_icon="🧬",
     layout="wide"
 )
@@ -348,6 +348,62 @@ def safe_unique(series):
     vals = series.dropna().unique().tolist()
     return sorted([str(v) for v in vals if str(v).strip() != ""])
 
+def label_active_inactive(value):
+    """Convert model outputs such as 1/0 into user-friendly activity labels."""
+    if pd.isna(value):
+        return value
+    value_str = str(value).strip()
+    if value_str in ["1", "1.0", "Active", "active"]:
+        return "Active"
+    if value_str in ["0", "0.0", "Inactive", "inactive"]:
+        return "Inactive"
+    return value
+
+def label_yes_no(value):
+    """Convert binary toxicity outputs into user-friendly Yes/No labels when needed."""
+    if pd.isna(value):
+        return value
+    value_str = str(value).strip()
+    if value_str in ["1", "1.0", "Yes", "yes"]:
+        return "Yes"
+    if value_str in ["0", "0.0", "No", "no"]:
+        return "No"
+    return value
+
+def format_probability(value):
+    """Show probability-like values with 3 digits after the decimal point."""
+    if pd.isna(value):
+        return value
+    try:
+        return f"{float(value):.3f}"
+    except (TypeError, ValueError):
+        return value
+
+def format_detail_value(field, value, group_name=""):
+    """Format values shown inside Compound Details expanders."""
+    field_lower = field.lower()
+    if field_lower.endswith(("_probability", "_prob")):
+        return format_probability(value)
+    if field_lower.endswith(("_prediction", "_pred")):
+        if "toxicity" in group_name.lower():
+            return label_yes_no(value)
+        if "ml predictions" in group_name.lower() or field_lower in ["ensemble_prediction", "rf_prediction", "svm_prediction", "knn_prediction", "xgboost_prediction", "lightgbm_prediction", "et_prediction"]:
+            return label_active_inactive(value)
+    return value
+
+def make_predictions_user_friendly(results_df):
+    """Round probabilities and convert model prediction numbers to labels for display/download."""
+    formatted_df = results_df.copy()
+    prob_cols = [c for c in formatted_df.columns if c.lower().endswith(("_prob", "_probability"))]
+    pred_cols = [c for c in formatted_df.columns if c.lower().endswith(("_pred", "_prediction"))]
+
+    for col in prob_cols:
+        formatted_df[col] = pd.to_numeric(formatted_df[col], errors="coerce").round(3)
+    for col in pred_cols:
+        formatted_df[col] = formatted_df[col].apply(label_active_inactive)
+
+    return formatted_df
+
 # ------------------------------
 # Load Pre-trained Models (Cached)
 # ------------------------------
@@ -466,8 +522,8 @@ def predict_smiles(smiles_list, include_properties=False):
                 proba = None
                 pred = None
 
-            row[f'{model_name}_prob'] = proba
-            row[f'{model_name}_pred'] = pred
+            row[f'{model_name}_prob'] = round(float(proba), 3) if proba is not None else None
+            row[f'{model_name}_pred'] = label_active_inactive(pred)
 
         results.append(row)
     return pd.DataFrame(results)
@@ -494,8 +550,8 @@ mode = st.sidebar.radio("Select Mode", ["📊 Database Browser", "🧪 Bioactivi
 # ------------------------------
 if mode == "📊 Database Browser":
     # Main Title
-    st.title("🎗️ MIND-EGFR")
-    st.markdown("**MIND-EGFR is an integrated web resource that combines a curated natural product database with an interactive bioactivity predictor, both focused on the Epidermal Growth Factor Receptor (EGFR) as a therapeutic target (PDB: 8F1Y).**")
+    st.title("🎗️ EGFR-MIND: A Machine Learning and Structure-Based Web Platform for Discovery of Natural Product EGFR Inhibitors")
+    st.markdown("**An integrated database-browser and prediction platform for identifying potential natural-product EGFR inhibitors.**")
     st.markdown("---")
 
     # Enhanced Introduction Section
@@ -670,7 +726,13 @@ if mode == "📊 Database Browser":
     )
 
     # Display table
-    st.dataframe(filtered_df[available_browser_cols], height=400, use_container_width=True)
+    browser_display_df = filtered_df[available_browser_cols].copy()
+    for col in browser_display_df.columns:
+        if col.lower().endswith(("_probability", "_prob")):
+            browser_display_df[col] = pd.to_numeric(browser_display_df[col], errors="coerce").round(3)
+        elif col.lower().endswith(("_prediction", "_pred")):
+            browser_display_df[col] = browser_display_df[col].apply(label_active_inactive)
+    st.dataframe(browser_display_df, height=400, use_container_width=True)
 
     st.markdown("---")
 
@@ -757,7 +819,7 @@ if mode == "📊 Database Browser":
                     cols = st.columns(2)
                     for i, field in enumerate(existing_fields):
                         with cols[i % 2]:
-                            st.write(f"**{field.replace('_', ' ').title()}:** {row[field]}")
+                            st.write(f"**{field.replace('_', ' ').title()}:** {format_detail_value(field, row[field], group_name)}")
     else:
         st.info("No compounds match the current filters.")
 
@@ -765,7 +827,7 @@ if mode == "📊 Database Browser":
 # MODE 2: Bioactivity Predictor
 # ------------------------------
 elif mode == "🧪 Bioactivity Predictor":
-    st.title("🧪 EGFR Bioactivity Predictor")
+    st.title("🧪 EGFR-MIND Bioactivity Predictor")
     st.markdown("Predict EGFR inhibitory activity and molecular properties from SMILES strings.")
     st.markdown("---")
 
@@ -862,8 +924,8 @@ elif mode == "🧪 Bioactivity Predictor":
                             proba = None
                             pred = None
 
-                        row[f'{model_name}_prob'] = proba
-                        row[f'{model_name}_pred'] = pred
+                        row[f'{model_name}_prob'] = round(float(proba), 3) if proba is not None else None
+                        row[f'{model_name}_pred'] = label_active_inactive(pred)
 
                     results.append(row)
                 
@@ -874,8 +936,9 @@ elif mode == "🧪 Bioactivity Predictor":
                 progress_text.text(f"📊 Progress: {percentage}% ({idx + 1}/{total_smiles} compounds processed)")
         
         results_df = pd.DataFrame(results)
+        results_df_display = make_predictions_user_friendly(results_df)
 
-        st.success(f"✅ Predictions completed for {len(results_df)} compounds.")
+        st.success(f"✅ Predictions completed for {len(results_df_display)} compounds.")
         
         # Display columns for preview
         display_cols = ['SMILES', 'QED', 'MW', 'LogP', 'TPSA', 'HBD', 'HBA', 'RotatableBonds', 
@@ -883,7 +946,7 @@ elif mode == "🧪 Bioactivity Predictor":
         available_display = [c for c in display_cols if c in results_df.columns]
         
         # Download button for preview
-        csv_data = results_df[available_display].to_csv(index=False).encode('utf-8')
+        csv_data = results_df_display[available_display].to_csv(index=False).encode('utf-8')
         st.download_button(
             label="⬇️ Download Results as CSV",
             data=csv_data,
@@ -892,14 +955,14 @@ elif mode == "🧪 Bioactivity Predictor":
         )
         
         # Display table
-        st.dataframe(results_df[available_display], height=400, use_container_width=True)
+        st.dataframe(results_df_display[available_display], height=400, use_container_width=True)
 
         # Full results expander
         with st.expander("🔍 View Full Results (All Models & Properties)"):
-            st.dataframe(results_df, use_container_width=True)
+            st.dataframe(results_df_display, use_container_width=True)
 
         # Download full results
-        csv_full = results_df.to_csv(index=False).encode('utf-8')
+        csv_full = results_df_display.to_csv(index=False).encode('utf-8')
         st.download_button(
             label="⬇️ Download Complete Results as CSV",
             data=csv_full,
@@ -908,8 +971,8 @@ elif mode == "🧪 Bioactivity Predictor":
         )
 
         # Show summary
-        if 'ensemble_pred' in results_df.columns:
-            active_count = (results_df['ensemble_pred'] == 1).sum()
+        if 'ensemble_pred' in results_df_display.columns:
+            active_count = (results_df_display['ensemble_pred'] == 'Active').sum()
             st.metric("Predicted Active (Ensemble)", active_count)
 
 # Footer
@@ -927,7 +990,7 @@ st.markdown("""
         Data Source: LOTUS Initiative (276,518 natural products) | Docking: AutoDock Vina | Target: EGFR (PDB: 8F1Y)
     </div>
     <div class="footer-section" style="opacity:0.7; margin-top:1rem;">
-        © 2026 MIND-EGFR — ML‑Guided Natural Product Database
+        © 2026 EGFR-MIND — ML‑Guided Natural Product Database
     </div>
 </div>
 """, unsafe_allow_html=True)
