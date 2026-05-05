@@ -8,9 +8,7 @@ A hybrid database-bioactivity predictor web platform for the discovery and prior
 Live app: https://mindegfr.streamlit.app
 
 
-[Workflow image]
 
-The workflow diagram is included in the GitHub repository as workflow.png. It should appear in README.md using:
 
 <p align="center">
   <img src="workflow.png" alt="MIND-EGFR workflow" width="850">
