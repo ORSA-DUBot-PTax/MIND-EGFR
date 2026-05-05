@@ -5,10 +5,12 @@ Machine Intelligence for Natural Drugs targeting EGFR
 
 A hybrid database-bioactivity predictor web platform for the discovery and prioritization of natural product-derived EGFR inhibitors.
 
-Live app: https://mindegfr.streamlit.app
+
+## Live app: https://mindegfr.streamlit.app
 
 
 
+# Workflow
 
 <p align="center">
   <img src="workflow.png" alt="MIND-EGFR workflow" width="850">
