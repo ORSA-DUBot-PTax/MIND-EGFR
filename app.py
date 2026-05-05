@@ -431,6 +431,140 @@ def safe_unique(series):
     vals = series.dropna().unique().tolist()
     return sorted([str(v) for v in vals if str(v).strip() != ""])
 
+
+DETAIL_LABELS = {
+    # Basic information
+    "lotus_id": "LOTUS ID",
+    "compound_name": "Compound Name",
+    "source_organism": "Source Organism",
+    "formula": "Formula",
+    "mw": "MW",
+    "smiles": "SMILES",
+
+    # Physicochemical properties
+    "heavy_atoms": "Heavy Atoms",
+    "aromatic_heavy_atoms": "Aromatic Heavy Atoms",
+    "fraction_csp3": "Fraction Csp3",
+    "rotatable_bonds": "Rotatable Bonds",
+    "hbond_acceptors": "H-Bond Acceptors",
+    "hbond_donors": "H-Bond Donors",
+    "molar_refractivity": "Molar Refractivity",
+    "tpsa": "TPSA",
+
+    # Lipophilicity and solubility
+    "ilogp": "IlogP",
+    "xlogp3": "XlogP3",
+    "wlogp": "WlogP",
+    "mlogp": "MlogP",
+    "silicos_it_logp": "Silicos IT logP",
+    "consensus_logp": "Consensus logP",
+    "esol_logs": "ESOL LogS",
+    "esol_class": "ESOL Class",
+    "ali_logs": "ALI LogS",
+    "ali_class": "ALI Class",
+    "silicos_it_logsw": "Silicos IT LogS",
+    "silicos_it_class": "Silicos IT Class",
+
+    # Drug-likeness
+    "gi_absorption": "GI Absorption",
+    "bbb_permeant": "BBB Permeant",
+    "pgp_substrate": "P-gp Substrate",
+    "cyp1a2_inhibitor": "CYP1A2 Inhibitor",
+    "cyp2c19_inhibitor": "CYP2C19 Inhibitor",
+    "cyp2c9_inhibitor": "CYP2C9 Inhibitor",
+    "cyp2d6_inhibitor": "CYP2D6 Inhibitor",
+    "cyp3a4_inhibitor": "CYP3A4 Inhibitor",
+    "log_kp": "Log Kp",
+    "lipinski_violations": "Lipinski Violations",
+    "ghose_violations": "Ghose Violations",
+    "veber_violations": "Veber Violations",
+    "egan_violations": "Egan Violations",
+    "muegge_violations": "Muegge Violations",
+    "bioavailability_score": "Bioavailability Score",
+    "pains_alerts": "PAINS Alerts",
+    "brenk_alerts": "Brenk Alerts",
+    "leadlikeness_violations": "Leadlikeness Violations",
+    "synthetic_accessibility": "Synthetic Accessibility",
+    "qed_score": "QED Score",
+
+    # ML predictions
+    "ensemble_probability": "Ensemble Probability",
+    "ensemble_prediction": "Ensemble Prediction",
+    "rf_probability": "RF Probability",
+    "rf_prediction": "RF Prediction",
+    "svm_probability": "SVM Probability",
+    "svm_prediction": "SVM Prediction",
+    "knn_probability": "KNN Probability",
+    "knn_prediction": "KNN Prediction",
+    "xgboost_probability": "XGBoost Probability",
+    "xgboost_prediction": "XGBoost Prediction",
+    "lightgbm_probability": "LightGBM Probability",
+    "lightgbm_prediction": "LightGBM Prediction",
+    "et_probability": "ET Probability",
+    "et_prediction": "ET Prediction",
+
+    # Docking results
+    "docking_affinity": "Docking Affinity",
+    "docking_success": "Docking Success",
+    "better_than_best_control": "Better Than Best Control",
+    "better_than_mean_control": "Better Than Mean Control",
+
+    # Toxicity predictions
+    "herg_blockers_probability": "HERG Blockers Probability",
+    "herg_blockers_prediction": "HERG Blockers Prediction",
+    "herg_blockers_10um_probability": "HERG Blockers 10uM Probability",
+    "herg_blockers_10um_prediction": "HERG Blockers 10uM Prediction",
+    "dili_probability": "DILI Probability",
+    "dili_prediction": "DILI Prediction",
+    "ames_toxicity_probability": "AMES Toxicity Probability",
+    "ames_toxicity_prediction": "AMES Toxicity Prediction",
+    "rat_oral_acute_toxicity_probability": "Rat Oral Acute Toxicity Probability",
+    "rat_oral_acute_toxicity_prediction": "Rat Oral Acute Toxicity Prediction",
+    "fdamdd_probability": "FDAMDD Probability",
+    "fdamdd_prediction": "FDAMDD Prediction",
+    "skin_sensitization_probability": "Skin Sensitization Probability",
+    "skin_sensitization_prediction": "Skin Sensitization Prediction",
+    "carcinogenicity_probability": "Carcinogenicity Probability",
+    "carcinogenicity_prediction": "Carcinogenicity Prediction",
+    "eye_corrosion_probability": "Eye Corrosion Probability",
+    "eye_corrosion_prediction": "Eye Corrosion Prediction",
+    "eye_irritation_probability": "Eye Irritation Probability",
+    "eye_irritation_prediction": "Eye Irritation Prediction",
+    "respiratory_toxicity_probability": "Respiratory Toxicity Probability",
+    "respiratory_toxicity_prediction": "Respiratory Toxicity Prediction",
+    "hepatotoxicity_probability": "Hepatotoxicity Probability",
+    "hepatotoxicity_prediction": "Hepatotoxicity Prediction",
+    "neurotoxicity_di_probability": "Neurotoxicity DI Probability",
+    "neurotoxicity_di_prediction": "Neurotoxicity DI Prediction",
+    "ototoxicity_probability": "Ototoxicity Probability",
+    "ototoxicity_prediction": "Ototoxicity Prediction",
+    "hematotoxicity_probability": "Hematotoxicity Probability",
+    "hematotoxicity_prediction": "Hematotoxicity Prediction",
+    "nephrotoxicity_di_probability": "Nephrotoxicity DI Probability",
+    "nephrotoxicity_di_prediction": "Nephrotoxicity DI Prediction",
+    "genotoxicity_probability": "Genotoxicity Probability",
+    "genotoxicity_prediction": "Genotoxicity Prediction",
+    "rpmi_8226_immunotoxicity_probability": "RPMI 8226 Immunotoxicity Probability",
+    "rpmi_8226_immunotoxicity_prediction": "RPMI 8226 Immunotoxicity Prediction",
+    "a549_cytotoxicity_probability": "A549 Cytotoxicity Probability",
+    "a549_cytotoxicity_prediction": "A549 Cytotoxicity Prediction",
+    "hek293_cytotoxicity_probability": "HEK293 Cytotoxicity Probability",
+    "hek293_cytotoxicity_prediction": "HEK293 Cytotoxicity Prediction",
+}
+
+def detail_label(field):
+    """Return polished display labels for Compound Details fields."""
+    return DETAIL_LABELS.get(field, field.replace("_", " ").title())
+
+def format_source_organism(value):
+    """Italicize scientific names where possible for display."""
+    if pd.isna(value):
+        return value
+    value_str = str(value).strip()
+    if not value_str:
+        return value_str
+    return f"<em>{value_str}</em>"
+
 def label_active_inactive(value):
     """Convert model outputs such as 1/0 into user-friendly activity labels."""
     if pd.isna(value):
@@ -864,9 +998,9 @@ if mode == "📊 Database Browser":
             ],
             "💧 Lipophilicity & Solubility": [
                 "ilogp", "xlogp3", "wlogp", "mlogp", "silicos_it_logp", "consensus_logp",
-                "esol_logs", "esol_solubility_mg_ml", "esol_solubility_mol_l", "esol_class",
-                "ali_logs", "ali_solubility_mg_ml", "ali_solubility_mol_l", "ali_class",
-                "silicos_it_logsw", "silicos_it_solubility_mg_ml", "silicos_it_solubility_mol_l", "silicos_it_class"
+                "esol_logs", "esol_class",
+                "ali_logs", "ali_class",
+                "silicos_it_logsw", "silicos_it_class"
             ],
             "🧪 Drug‑likeness": [
                 "gi_absorption", "bbb_permeant", "pgp_substrate",
@@ -921,7 +1055,12 @@ if mode == "📊 Database Browser":
                     cols = st.columns(2)
                     for i, field in enumerate(existing_fields):
                         with cols[i % 2]:
-                            st.write(f"**{field.replace('_', ' ').title()}:** {format_detail_value(field, row[field], group_name)}")
+                            display_value = format_detail_value(field, row[field], group_name)
+                            if field == "source_organism":
+                                display_value = format_source_organism(display_value)
+                                st.markdown(f"**{detail_label(field)}:** {display_value}", unsafe_allow_html=True)
+                            else:
+                                st.write(f"**{detail_label(field)}:** {display_value}")
     else:
         st.info("No compounds match the current filters.")
 
