@@ -580,7 +580,7 @@ mode = st.sidebar.radio("Select Mode", ["📊 Database Browser", "🧪 Bioactivi
 if mode == "📊 Database Browser":
     # Main Title
     st.title("🎗️ MIND-EGFR")
-    st.markdown("**An integrated database-browser and prediction platform for identifying potential natural-product EGFR inhibitors.**")
+    st.markdown("**A Machine Learning and Structure-Based Web Platform for Discovery of Natural Product EGFR Inhibitors**")
     st.markdown("---")
 
     # Compact About Section with tabs
@@ -595,9 +595,8 @@ if mode == "📊 Database Browser":
     with about_tab:
         st.markdown("""
         <div class="about-card">
-            <h4>MIND-EGFR</h4>
-            <p><strong>MIND</strong> stands for <strong>Machine Intelligence for Natural Drugs</strong>.</p>
-            <p><strong>MIND-EGFR</strong> is a machine learning and structure-based web platform for the discovery of natural product EGFR inhibitors. It integrates a curated natural-product database, EGFR-focused bioactivity prediction, ADME/drug-likeness profiles, toxicity annotations, and docking outcomes for interactive compound prioritization.</p>
+            <h4>About MIND-EGFR</h4>
+            <p><strong>MIND-EGFR</strong> (<strong>Machine Intelligence for Natural Drugs targeting EGFR</strong>) is a dynamic machine learning and structure-based web resource that integrates a curated natural-product database with EGFR-focused bioactivity prediction, ADME and drug-likeness profiling, toxicity annotation, and molecular docking results. Designed to support efficient compound prioritization, MIND-EGFR provides an interactive platform for exploring, filtering, evaluating, and ranking natural products with potential EGFR-inhibitory activity. By combining data-driven intelligence with structure-guided drug discovery, the platform helps researchers identify promising natural compounds for further experimental validation against EGFR.</p>
         </div>
         """, unsafe_allow_html=True)
 
