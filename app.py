@@ -24,7 +24,7 @@ except ImportError:
 
 # ========== MUST BE FIRST STREAMLIT COMMAND ==========
 st.set_page_config(
-    page_title="EGFR-MIND: A Machine Learning and Structure-Based Web Platform for Discovery of Natural Product EGFR Inhibitors",
+    page_title="MIND-EGFR",
     page_icon="🧬",
     layout="wide"
 )
@@ -206,24 +206,53 @@ def local_css():
             transform: translateY(-3px);
         }
         
-        /* Footer */
+        /* Compact tab and footer styling */
+        .about-card {
+            background: linear-gradient(135deg, #eae8e0 0%, #e8f1f9 100%);
+            border-radius: 12px;
+            padding: 1.2rem 1.4rem;
+            border: 1px solid #d4e4f7;
+            box-shadow: 0 3px 10px rgba(0, 102, 204, 0.08);
+            margin-bottom: 0.8rem;
+        }
+        .about-card p, .about-card li {
+            color: #2e5c8a;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+        .about-card h4 {
+            margin-top: 0;
+            margin-bottom: 0.6rem;
+            color: #1f4788;
+        }
+        div[data-baseweb="tab-list"] {
+            gap: 0.4rem;
+        }
+        button[data-baseweb="tab"] {
+            background-color: #e8f1f9;
+            border-radius: 8px 8px 0 0;
+            border: 1px solid #d4e4f7;
+            padding: 0.45rem 0.8rem;
+            color: #1f4788;
+            font-weight: 700;
+        }
         .footer {
-            margin-top: 3rem;
-            padding: 2rem;
+            margin-top: 2rem;
+            padding: 1.15rem 1.4rem;
             text-align: center;
             border-top: 2px solid #0066cc;
             background: linear-gradient(135deg, #eae8e0 0%, #e8f1f9 100%);
             border-radius: 10px;
             color: #2e5c8a;
-            font-size: 0.95rem;
-            line-height: 1.8;
+            font-size: 0.84rem;
+            line-height: 1.45;
         }
         .footer .names {
             font-weight: 700;
             color: #0066cc;
         }
         .footer-section {
-            margin: 0.8rem 0;
+            margin: 0.35rem 0;
         }
         
         /* Radio buttons (navigation) */
@@ -550,33 +579,49 @@ mode = st.sidebar.radio("Select Mode", ["📊 Database Browser", "🧪 Bioactivi
 # ------------------------------
 if mode == "📊 Database Browser":
     # Main Title
-    st.title("🎗️ EGFR-MIND: A Machine Learning and Structure-Based Web Platform for Discovery of Natural Product EGFR Inhibitors")
+    st.title("🎗️ MIND-EGFR")
     st.markdown("**An integrated database-browser and prediction platform for identifying potential natural-product EGFR inhibitors.**")
     st.markdown("---")
 
-    # Enhanced Introduction Section
-    with st.container():
-        col_left, col_right = st.columns(2)
-        with col_left:
-            st.markdown("#### 📦 Database Construction")
-            st.markdown("""
-            - **276,518** natural products from the LOTUS initiative  
-            - **142,035** passed Lipinski's Rule of Five (zero violations)  
-            - **778** predicted as active by an ensemble of six ML classifiers  
-            - **730** successfully docked into EGFR (8F1Y)  
-            - **16** compounds exceed the best control drug (Poziotinib, −8.9 kcal/mol)  
-            - **139** compounds outperform the mean control affinity (−7.9 kcal/mol)
-            """)
-        with col_right:
-            st.markdown("#### ⚙️ Machine Learning Performance")
-            st.markdown("""
-            - **Ensemble model** – 5‑fold CV AUC: **0.9646 ± 0.0037**  
-            - External validation accuracy: **88.05%**, AUC: **0.9411**  
-            - Individual classifiers: RF, SVM, KNN, XGBoost, LightGBM, ExtraTrees  
-            - All models trained on Morgan fingerprints (radius 2, 2048 bits)
-            """)
+    # Compact About Section with tabs
+    about_tab, construction_tab, performance_tab, features_tab, detailed_tab = st.tabs([
+        "ℹ️ About",
+        "📦 Database Construction",
+        "⚙️ ML Performance",
+        "🧬 Key Features",
+        "📊 Detailed Metrics"
+    ])
 
-        # Key Features with equal spacing using columns
+    with about_tab:
+        st.markdown("""
+        <div class="about-card">
+            <h4>MIND-EGFR</h4>
+            <p><strong>MIND</strong> stands for <strong>Machine Intelligence for Natural Drugs</strong>.</p>
+            <p><strong>MIND-EGFR</strong> is a machine learning and structure-based web platform for the discovery of natural product EGFR inhibitors. It integrates a curated natural-product database, EGFR-focused bioactivity prediction, ADME/drug-likeness profiles, toxicity annotations, and docking outcomes for interactive compound prioritization.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with construction_tab:
+        st.markdown("#### 📦 Database Construction")
+        st.markdown("""
+        - **276,518** natural products from the LOTUS initiative  
+        - **142,035** passed Lipinski's Rule of Five (zero violations)  
+        - **778** predicted as active by an ensemble of six ML classifiers  
+        - **730** successfully docked into EGFR (8F1Y)  
+        - **16** compounds exceed the best control drug (Poziotinib, −8.9 kcal/mol)  
+        - **139** compounds outperform the mean control affinity (−7.9 kcal/mol)
+        """)
+
+    with performance_tab:
+        st.markdown("#### ⚙️ Machine Learning Performance")
+        st.markdown("""
+        - **Ensemble model** – 5‑fold CV AUC: **0.9646 ± 0.0037**  
+        - External validation accuracy: **88.05%**, AUC: **0.9411**  
+        - Individual classifiers: RF, SVM, KNN, XGBoost, LightGBM, ExtraTrees  
+        - All models trained on Morgan fingerprints (radius 2, 2048 bits)
+        """)
+
+    with features_tab:
         st.markdown("#### 🧬 Key Features")
         feat_cols = st.columns(3)
         features = [
@@ -591,23 +636,23 @@ if mode == "📊 Database Browser":
             with feat_cols[i % 3]:
                 st.markdown(f'<div class="feature-item">{feat}</div>', unsafe_allow_html=True)
 
-        # Detailed performance expander
-        with st.expander("📊 View Detailed ML Performance (Cross‑Validation & External Validation)"):
-            st.markdown("""
-            | Model         | 5‑Fold CV AUC (mean ± SD) | External Accuracy | External AUC |
-            |---------------|---------------------------|-------------------|--------------|
-            | Random Forest | 0.9603 ± 0.0037           | 0.8810            | 0.9406       |
-            | SVM           | 0.9548 ± 0.0054           | 0.8715            | 0.9250       |
-            | KNN           | 0.9489 ± 0.0044           | 0.8580            | 0.9256       |
-            | XGBoost       | 0.9635 ± 0.0037           | 0.8685            | 0.9345       |
-            | LightGBM      | 0.9619 ± 0.0032           | 0.8585            | 0.9309       |
-            | ExtraTrees    | 0.9619 ± 0.0036           | 0.8845            | 0.9411       |
-            | **Ensemble**  | **0.9646 ± 0.0037**       | **0.8805**        | **0.9411**   |
-            
-            **Control docking benchmarks (AutoDock Vina, 8F1Y):**  
-            - Best control (Poziotinib): −8.9 kcal/mol  
-            - Mean of all control drugs: −7.98 kcal/mol
-            """)
+    with detailed_tab:
+        st.markdown("#### 📊 Detailed ML Performance")
+        st.markdown("""
+        | Model         | 5‑Fold CV AUC (mean ± SD) | External Accuracy | External AUC |
+        |---------------|---------------------------|-------------------|--------------|
+        | Random Forest | 0.9603 ± 0.0037           | 0.8810            | 0.9406       |
+        | SVM           | 0.9548 ± 0.0054           | 0.8715            | 0.9250       |
+        | KNN           | 0.9489 ± 0.0044           | 0.8580            | 0.9256       |
+        | XGBoost       | 0.9635 ± 0.0037           | 0.8685            | 0.9345       |
+        | LightGBM      | 0.9619 ± 0.0032           | 0.8585            | 0.9309       |
+        | ExtraTrees    | 0.9619 ± 0.0036           | 0.8845            | 0.9411       |
+        | **Ensemble**  | **0.9646 ± 0.0037**       | **0.8805**        | **0.9411**   |
+        
+        **Control docking benchmarks (AutoDock Vina, 8F1Y):**  
+        - Best control (Poziotinib): −8.9 kcal/mol  
+        - Mean of all control drugs: −7.98 kcal/mol
+        """)
 
     st.markdown("---")
 
@@ -721,7 +766,7 @@ if mode == "📊 Database Browser":
     st.download_button(
         "⬇️ Download filtered results as CSV",
         data=csv,
-        file_name="egfr_npdb_filtered.csv",
+        file_name="mind_egfr_filtered.csv",
         mime="text/csv"
     )
 
@@ -827,7 +872,7 @@ if mode == "📊 Database Browser":
 # MODE 2: Bioactivity Predictor
 # ------------------------------
 elif mode == "🧪 Bioactivity Predictor":
-    st.title("🧪 EGFR-MIND Bioactivity Predictor")
+    st.title("🧪 MIND-EGFR Bioactivity Predictor")
     st.markdown("Predict EGFR inhibitory activity and molecular properties from SMILES strings.")
     st.markdown("---")
 
@@ -980,17 +1025,19 @@ st.markdown("---")
 st.markdown("""
 <div class="footer">
     <div class="footer-section">
-        <span class="names">Sheikh Sunzid Ahmed</span> and <span class="names">M. Oliur Rahman</span><br>
+        <span class="names">Sheikh Sunzid Ahmed</span> and <span class="names">M. Oliur Rahman</span>
+    </div>
+    <div class="footer-section">
         Plant Taxonomy and Ethnobotany Laboratory, Department of Botany, University of Dhaka
     </div>
     <div class="footer-section">
-        Built with Streamlit, SQLite, and RDKit | Ensemble ML Models (RF, SVM, KNN, XGBoost, LightGBM, ExtraTrees)
+        Built with Streamlit, SQLite, RDKit, and ensemble ML models: RF, SVM, KNN, XGBoost, LightGBM, ExtraTrees
     </div>
     <div class="footer-section">
-        Data Source: LOTUS Initiative (276,518 natural products) | Docking: AutoDock Vina | Target: EGFR (PDB: 8F1Y)
+        LOTUS Initiative natural products | AutoDock Vina docking | Target: EGFR (PDB: 8F1Y)
     </div>
-    <div class="footer-section" style="opacity:0.7; margin-top:1rem;">
-        © 2026 EGFR-MIND — ML‑Guided Natural Product Database
+    <div class="footer-section" style="opacity:0.72;">
+        © 2026 MIND-EGFR — Machine Intelligence for Natural Drugs
     </div>
 </div>
 """, unsafe_allow_html=True)
