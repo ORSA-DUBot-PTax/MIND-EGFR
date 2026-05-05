@@ -224,15 +224,13 @@ Input options:
 - Paste SMILES strings directly, one per line
 - Upload a CSV file containing a SMILES column
 
-Example input:
+#### Example input:
 
 CCOc1cc2ncnc(Nc3ccc(F)c(Cl)c3)c2cc1OCC
 
 COc1cc2ncnc(Nc3cccc(Cl)c3)c2cc1OC
 
-For CSV upload, the file should contain a column named:
-
-SMILES
+*For CSV upload, the file should contain a column named SMILES*
 
 The app returns EGFR bioactivity prediction results, probability scores, class labels, and basic molecular properties.
 
@@ -253,8 +251,11 @@ MIND-EGFR is designed for:
 ## Developers
 
 Sheikh Sunzid Ahmed and M. Oliur Rahman
+
 Plant Taxonomy and Ethnobotany Laboratory
+
 Department of Botany
+
 University of Dhaka
 
 
