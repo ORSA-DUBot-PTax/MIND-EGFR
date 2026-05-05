@@ -227,6 +227,7 @@ Input options:
 Example input:
 
 CCOc1cc2ncnc(Nc3ccc(F)c(Cl)c3)c2cc1OCC
+
 COc1cc2ncnc(Nc3cccc(Cl)c3)c2cc1OC
 
 For CSV upload, the file should contain a column named:
